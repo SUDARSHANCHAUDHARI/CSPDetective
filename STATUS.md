@@ -42,4 +42,4 @@ Each of these is a separate, scoped piece of work to add on top of this scaffold
 
 ## Deployment
 
-Not yet deployed. **Zero-config Vercel** (`vercel --prod`) — no env vars required for the MVP.
+Not yet deployed. Self-hosted on your own domain. Stock Next.js with no env vars for the MVP — deploy via the same flow you use for your other apps.

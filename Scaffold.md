@@ -50,8 +50,8 @@ BullMQ
 Redis
 
 Deployment:
-Vercel
-Railway
+Self-hosted on your own domain (existing portfolio hosting)
+Railway / Fly / your container host (for any backend services)
 Supabase / Neon
 Upstash Redis
 Repo structure
@@ -127,7 +127,6 @@ csp-detective/
   infra/
     docker-compose.yml
     railway.json
-    vercel.json
 
   .env.example
   package.json
