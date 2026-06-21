@@ -76,3 +76,35 @@ Not yet deployed. Self-hosted on your own domain. Stock Next.js with no env vars
 - [ ] AI-powered explanations + fix suggestions (OpenAI / Anthropic)
 - [ ] Persistence (Postgres / Redis from original spec)
 - [ ] Auth
+
+## Categorized work remaining
+
+| Item | Effort | Bucket | Blocker | Priority |
+|------|--------|--------|---------|----------|
+| CSP policy parser + UI breakdown | ~1d | 🟦 Pure code | none — parse directives, flag unsafe sources | P1 |
+| X-Frame-Options / frame-ancestors simulator | ~half day | 🟦 Pure code | none — pure logic from headers | P2 |
+| Playwright rendering tests (screenshot + console capture) | ~1–2d | 🟦 Pure code | none — adds `playwright` dep + a `/api/render` route | P2 |
+| Browser compatibility matrix | ~1d | 🟦 Pure code | none — extend Playwright multi-browser projects | P3 |
+| AI explanations + fix suggestions | ~1d | 🟦 Pure code | needs `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` for live use | P2 |
+| Persistence (Postgres / Redis) | ~1d | 🟦 Pure code (+🔑 hosted DB) | only needed when adding auth + history | P3 |
+| Auth | ~1d | 🟦 Pure code | none — pick a provider (Clerk / NextAuth / custom) | P3 |
+| Deploy MVP to your domain | ~30m | 🔑 Needs hosting | hosting access; no env vars for MVP | P1 |
+
+## Release plan
+
+CSP Detective is the longest-tail repo. Phased releases:
+
+1. **`v0.1.0` (now):** MVP — URL inspector with security-header highlighting.
+2. **`v0.2.0`:** CSP parser (directives + unsafe-source flags) + X-Frame simulator.
+3. **`v0.3.0`:** Playwright rendering tests (screenshot, console errors).
+4. **`v0.4.0`:** AI explanations (`OPENAI_API_KEY` required to use; falls back to "set key" message without).
+5. **`v0.5.0`:** Browser compatibility matrix.
+6. **`v1.0.0`:** Auth + persistence (history of past inspections per user).
+
+### Deploy prerequisites
+**For the MVP (`v0.1.0`):** None. Stock Next.js, no env vars, no database.
+
+**As features land:**
+- `v0.3.0+`: Playwright Chromium binary on the host (`pnpm playwright install chromium` in build step)
+- `v0.4.0+`: `OPENAI_API_KEY` (or `ANTHROPIC_API_KEY`)
+- `v1.0.0+`: `DATABASE_URL` (Postgres) + auth provider credentials
