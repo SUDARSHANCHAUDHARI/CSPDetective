@@ -42,4 +42,37 @@ Each of these is a separate, scoped piece of work to add on top of this scaffold
 
 ## Deployment
 
-Not yet deployed. **Zero-config Vercel** (`vercel --prod`) — no env vars required for the MVP.
+Not yet deployed. Self-hosted on your own domain. Stock Next.js with no env vars for the MVP — deploy via the same flow you use for your other apps.
+
+## File-by-file checklist
+
+### App shell
+- [x] `app/layout.tsx` — root layout + metadata
+- [x] `app/page.tsx` — single-page UI (URL input → headers table with security highlighting)
+- [x] `app/globals.css` — Tailwind base
+
+### API
+- [x] `app/api/headers/route.ts` — GET `/api/headers?url=…` with 10 s AbortController timeout, returns status/finalUrl/headers JSON, custom User-Agent
+
+### Lib
+- [x] `lib/url.ts` — `validateTargetUrl()` pure SSRF guard (http(s) only, blocks `file:` / `javascript:` / `ftp:` / `gopher:`)
+
+### Tests
+- [x] `lib/url.test.ts` — 8 tests including the SSRF rejection cases (test suite caught a real bug in `validateTargetUrl` during development)
+
+### Tooling
+- [x] `package.json` — Next 15 + React 19 + TS strict + Tailwind + ESLint + Vitest
+- [x] `tsconfig.json` (strict)
+- [x] `.eslintrc.json` (next/core-web-vitals)
+- [x] `tailwind.config.js`, `postcss.config.js`
+- [x] `next.config.js` (reactStrictMode: true)
+- [x] `vitest.config.ts`
+
+### Not done (the original product vision)
+- [ ] CSP policy parsing + analysis (currently shows raw string only)
+- [ ] `X-Frame-Options` / `frame-ancestors` simulation (iframe-compat verdict)
+- [ ] Playwright rendering tests (live screenshot, console-error capture, in-iframe render verification)
+- [ ] Browser compatibility matrix (Safari, kiosk Chrome, signage Edge, etc.)
+- [ ] AI-powered explanations + fix suggestions (OpenAI / Anthropic)
+- [ ] Persistence (Postgres / Redis from original spec)
+- [ ] Auth

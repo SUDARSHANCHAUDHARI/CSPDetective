@@ -47,12 +47,7 @@ Each of these is a separate, scoped piece of work to add on top of this scaffold
 
 ## Deployment
 
-The MVP is a stock Next.js 15 app with no external dependencies, no environment variables, and no database. Zero-config Vercel deploy:
-
-```bash
-vercel        # preview
-vercel --prod # production
-```
+The MVP is a stock Next.js 15 app with no external dependencies, no environment variables, and no database. Self-hosted on your own domain — `pnpm build` produces the Next runtime output, deploy it via the same hosting flow you use for the rest of the portfolio.
 
 ## License
 
