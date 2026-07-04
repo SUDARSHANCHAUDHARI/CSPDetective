@@ -78,3 +78,10 @@ pids
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# Internal docs — kept local, not published
+ProjectFile.md
+Scaffold.md
+RELEASE_MEMORY.md
+STATUS.md
+AGENTS.md
