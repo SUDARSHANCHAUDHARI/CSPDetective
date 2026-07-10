@@ -1,18 +1,24 @@
-import { NextResponse } from "next/server";
-import { validateTargetUrl } from "@/lib/url";
-
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+// Cloudflare Pages Function — serves GET /api/headers.
+// Ported from the former Next.js route handler (app/api/headers/route.ts) so the
+// app can be a static export + Functions on Cloudflare Pages. Uses only Web APIs.
+import { validateTargetUrl } from "../../lib/url";
 
 const FETCH_TIMEOUT_MS = 10_000;
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
+export const onRequestGet = async (context: { request: Request }): Promise<Response> => {
+  const { searchParams } = new URL(context.request.url);
   const rawUrl = searchParams.get("url") ?? "";
 
   const validation = validateTargetUrl(rawUrl);
   if (!validation.ok) {
-    return NextResponse.json({ error: validation.error }, { status: 400 });
+    return json({ error: validation.error }, 400);
   }
 
   const controller = new AbortController();
@@ -34,7 +40,7 @@ export async function GET(request: Request) {
       headers[key] = value;
     });
 
-    return NextResponse.json({
+    return json({
       url: validation.url,
       finalUrl: response.url,
       status: response.status,
@@ -48,8 +54,8 @@ export async function GET(request: Request) {
         : error instanceof Error
           ? error.message
           : "Failed to fetch URL.";
-    return NextResponse.json({ error: message }, { status: 502 });
+    return json({ error: message }, 502);
   } finally {
     clearTimeout(timeout);
   }
-}
+};
