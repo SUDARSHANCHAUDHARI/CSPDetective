@@ -47,7 +47,10 @@ Each of these is a separate, scoped piece of work to add on top of this scaffold
 
 ## Deployment
 
-The MVP is a stock Next.js 15 app with no external dependencies, no environment variables, and no database. Self-hosted on your own domain — `pnpm build` produces the Next runtime output, deploy it via the same hosting flow you use for the rest of the portfolio.
+No external dependencies, no environment variables, no database. Deployed on
+**Cloudflare Pages** as a static export (`npx next build` → `out`) plus one
+native Pages Function (`functions/api/headers.ts`, Web-APIs only — no
+`nodejs_compat` needed). Live at `cspdetective.sudarshantechlabs.com`.
 
 ## License
 
