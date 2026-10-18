@@ -4,6 +4,7 @@
 import { validateTargetUrl } from "../../lib/url";
 
 const FETCH_TIMEOUT_MS = 10_000;
+const MAX_REDIRECTS = 5;
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -25,15 +26,30 @@ export const onRequestGet = async (context: { request: Request }): Promise<Respo
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(validation.url, {
-      method: "GET",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        // Identify ourselves so site owners can see who's probing.
-        "user-agent": "CSP-Detective/0.1 (+https://github.com/SUDARSHANCHAUDHARI/CSPDetective)",
-      },
-    });
+    // Follow redirects by hand so every hop goes through validateTargetUrl.
+    let currentUrl = validation.url;
+    let response: Response;
+    for (let hop = 0; ; hop++) {
+      response = await fetch(currentUrl, {
+        method: "GET",
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          // Identify ourselves so site owners can see who's probing.
+          "user-agent": "CSP-Detective/0.1 (+https://github.com/SUDARSHANCHAUDHARI/CSPDetective)",
+        },
+      });
+      const location = response.headers.get("location");
+      if (response.status < 300 || response.status >= 400 || !location) break;
+      if (hop >= MAX_REDIRECTS) {
+        return json({ error: `Too many redirects (more than ${MAX_REDIRECTS}).` }, 502);
+      }
+      const next = validateTargetUrl(new URL(location, currentUrl).toString());
+      if (!next.ok) {
+        return json({ error: `Redirect blocked: ${next.error}` }, 400);
+      }
+      currentUrl = next.url;
+    }
 
     const headers: Record<string, string> = {};
     response.headers.forEach((value, key) => {
@@ -42,7 +58,7 @@ export const onRequestGet = async (context: { request: Request }): Promise<Respo
 
     return json({
       url: validation.url,
-      finalUrl: response.url,
+      finalUrl: currentUrl,
       status: response.status,
       statusText: response.statusText,
       headers,
