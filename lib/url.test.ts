@@ -45,6 +45,28 @@ describe("validateTargetUrl", () => {
     expect(validateTargetUrl("ht tp://broken").ok).toBe(false);
   });
 
+  it("rejects private, loopback, link-local and internal hosts (SSRF guard)", () => {
+    for (const bad of [
+      "http://127.0.0.1",
+      "http://169.254.169.254/latest/meta-data/",
+      "http://[::1]",
+      "http://10.0.0.5",
+      "http://172.16.0.1",
+      "http://192.168.1.1",
+      "http://100.64.0.1",
+      "http://0.0.0.0",
+      "http://0x7f.1",
+      "http://[::ffff:127.0.0.1]",
+      "http://[fd00::1]",
+      "http://[fe80::1]",
+      "http://localhost",
+      "http://printer.local",
+      "http://metadata.google.internal",
+    ]) {
+      expect(validateTargetUrl(bad).ok, bad).toBe(false);
+    }
+  });
+
   it("preserves a path and query string", () => {
     expect(validateTargetUrl("https://example.com/path?q=1")).toEqual({
       ok: true,
